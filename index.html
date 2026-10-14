@@ -112,6 +112,12 @@ h2{margin:0 0 8px;font-size:18px;font-weight:800}
 .steps .ok i{background:#8BE3A8;color:#064B24}
 .steps .on{background:#fff;border-color:var(--or);color:#0A6B35}
 .steps .on b{color:var(--or)}.steps .on i{background:var(--or);color:#fff}
+
+.rec{margin-top:14px;display:flex;gap:12px;align-items:center;padding:14px;border-radius:16px;background:linear-gradient(135deg,#FFF3D6,#FFE2A8);border:2.5px solid var(--or);color:#4A2C00;font-weight:600;line-height:1.4;box-shadow:0 0 0 4px rgba(240,127,10,.18),0 6px 18px rgba(240,127,10,.3)}
+.rec b{color:#C25A00;font-weight:800;font-size:15px}
+.bulb{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:28px;background:#fff;animation:glow 1.8s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 6px 2px rgba(255,200,40,.5)}50%{box-shadow:0 0 20px 8px rgba(255,200,40,.95)}}
+@media(prefers-reduced-motion:reduce){.bulb{animation:none;box-shadow:0 0 14px 5px rgba(255,200,40,.8)}}
 </style></head><body>
 <header class="top" id="top">
 <div class="tr"><a class="back" href="https://capacitacion3vesmartin-ves.github.io/campuscapacitacion/">‹ Volver</a><span class="tt">Simulador Cálculo de techos</span></div>
@@ -179,7 +185,8 @@ h2{margin:0 0 8px;font-size:18px;font-weight:800}
 <div class="cap">Techos por ciento<span class="n">10</span></div><span class="op">=</span>
 <div class="cap">Tornillos<span class="n fin big" id="c5">—</span></div>
 </div><div class="note">1 ciento de tornillos por cada 10 techos.</div></div>
-<div class="ent"><b>💡 Venta cruzada: sugiere también</b><div class="chips"><span>Canaletas</span><span>Abrazaderas</span><span>Espuma expansiva</span><span>Cumbreras</span><span>Sellador</span></div></div></section>
+<div class="ent"><b>💡 Venta cruzada: sugiere también</b><div class="chips"><span>Canaletas</span><span>Abrazaderas</span><span>Espuma expansiva</span><span>Cumbreras</span><span>Y mucho más...</span></div></div>
+<div class="rec"><div class="bulb">💡</div><div><b>RECUERDA:</b> Debes indicar al cliente que el cálculo es aproximado. Siempre hay posibilidad que pueda faltar o sobrar material según instalación.</div></div></section>
 </main>
 <footer class="bot" id="bot"><button id="pv" class="nb pv">‹ ANTERIOR</button><button id="nx" class="nb nx">SIGUIENTE ›</button></footer>
 <script>
