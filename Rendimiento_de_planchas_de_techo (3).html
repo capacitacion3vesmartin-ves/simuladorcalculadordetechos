@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulador Cálculo de techos</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F8F4;--card:#fff;--ink:#1E2A24;--mut:#5D6B63;--or:#E8701A;--gr:#2E9E5B;--bl:#2B7BD1;--pu:#8E4FD0;--ln:#DCE5DE;--soft:#E7F0E9;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#13201A;--card:#1B2A22;--ink:#EAF1EC;--mut:#9DB0A4;--ln:#2C4036;--soft:#223329;--bl:#5AA2EE;--pu:#B58AF0}}
+:root[data-theme="dark"]{--bg:#13201A;--card:#1B2A22;--ink:#EAF1EC;--mut:#9DB0A4;--ln:#2C4036;--soft:#223329;--bl:#5AA2EE;--pu:#B58AF0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.35 "Plus Jakarta Sans",system-ui,sans-serif}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:18px;align-items:start}
+.right .sep{margin-top:20px}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}.right .sep{margin-top:16px}}
+main{max-width:1120px;margin:0 auto;padding:14px 14px 36px}
+h1{font-size:clamp(20px,4.5vw,26px);line-height:1.1;margin:0 0 10px;font-weight:800;letter-spacing:-.02em}
+button,input{font:inherit;color:inherit}
+.fmt{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-bottom:10px}
+.fmt label{display:flex;flex-direction:column;font-weight:800;font-size:12px;gap:2px}
+.fmt input{width:92px;font-size:17px;font-weight:800;border:2.5px solid;background:var(--card);border-radius:10px;padding:4px 9px}
+#iw{border-color:var(--bl)}#il{border-color:var(--pu)}.cw{color:var(--bl)}.cl{color:var(--pu)}
+.fmt .x{font-size:17px;font-weight:800;padding-bottom:7px}
+.dots{display:flex;gap:7px;padding-bottom:7px;margin-left:auto}
+.dots button{width:24px;height:24px;border-radius:50%;border:3px solid transparent;cursor:pointer}
+.dots button[aria-pressed=true]{border-color:var(--ink)}
+.tool{border:1.5px solid var(--ln);background:var(--card);border-radius:999px;cursor:pointer;font-weight:600}
+button:focus-visible,input:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+#stage{position:relative;height:460px;background:var(--soft);border-radius:18px;overflow:hidden;perspective:1500px;touch-action:none;cursor:grab;user-select:none}
+#stage:active{cursor:grabbing}
+#sc{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;transform:translate(var(--px),var(--py)) scale(var(--z)) rotateX(var(--rx)) rotateZ(var(--rz))}
+#sc>div{position:absolute}
+.sh{background:repeating-linear-gradient(90deg,rgba(255,255,255,.32) 0,rgba(0,0,0,.2) 4px,rgba(255,255,255,.32) 8px),var(--c);box-shadow:0 0 0 1px rgba(0,0,0,.4),3px 5px 9px rgba(0,0,0,.25);border-radius:2px}
+.ht{background:repeating-linear-gradient(45deg,rgba(255,255,255,.8) 0 4px,var(--or) 4px 8px)}
+.ut{border:3px dashed var(--gr);background:rgba(46,158,91,.3);pointer-events:none}
+.bw{background:var(--bl)}.bl{background:var(--pu)}
+#sc>.pb{width:0;height:0;transform:translateZ(30px) rotateZ(calc(var(--rz)*-1)) rotateX(calc(var(--rx)*-1)) scale(calc(1/var(--z)))}
+.pb span{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;color:#fff;font-weight:800;font-size:11px;padding:2px 8px;border-radius:99px;background:var(--or)}
+.pb.w span{background:var(--bl)}.pb.l span{background:var(--pu)}.pb.u span{background:var(--gr)}
+.tools{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.tools .tool{padding:0;width:34px;height:34px;font-size:15px}
+.ctl{display:grid;grid-template-columns:68px 1fr 70px;align-items:center;gap:8px;margin-top:8px;font-weight:800}
+.ctl output{font-variant-numeric:tabular-nums;font-weight:800;color:var(--or);font-size:13px}
+input[type=range]{width:100%;height:28px}
+#vs{accent-color:var(--bl)}#vt{accent-color:var(--pu)}
+.ent{margin-top:10px;background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:14px}
+.eqs{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lb{width:84px;font-weight:800}
+.n{border-radius:10px;padding:4px 10px;font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;border:2.5px solid;background:var(--card)}
+.n.b{border-color:var(--bl);color:var(--bl)}.n.o{border-color:var(--or);color:var(--or)}
+.n.bs{background:var(--bl);border-color:var(--bl);color:#fff}.n.ps{background:var(--pu);border-color:var(--pu);color:#fff}
+.n.g{background:var(--gr);border-color:var(--gr);color:#fff;font-size:21px}
+.k .lb{color:var(--ink)}.k .n{border-color:var(--ink);color:var(--ink)}.k .cin{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.cin label{display:flex;flex-direction:column;font-weight:800;font-size:12px;gap:2px}
+.cin input{width:84px;font-size:16px;font-weight:800;border:2.5px solid var(--ink);background:var(--card);border-radius:10px;padding:4px 8px}
+.x2{padding-bottom:7px;font-weight:800;color:var(--mut)}
+.cin+.eqs{margin-top:14px}
+.n.go{border-color:var(--gr);color:var(--gr)}.n.big{font-size:21px}.fin{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.op{color:var(--ink)}.k .n.fin{background:var(--ink);color:var(--bg)}
+.op{font-size:18px;font-weight:800;color:var(--mut)}
+.sep{display:flex;align-items:center;gap:10px;margin:16px 0 4px;font-weight:800;font-size:16px}
+.sep:before,.sep:after{content:"";flex:1;height:2px;background:var(--ln)}
+@media(max-width:560px){.ctl{grid-template-columns:58px 1fr 62px}#stage{height:420px}.dots{margin-left:0}}
+.back{display:inline-block;padding:5px 12px;border:1.5px solid var(--gr);border-radius:999px;color:var(--gr);font-weight:800;text-decoration:none;background:var(--card);font-size:13px}
+:root{padding-top:0;padding-bottom:0}
+.top,.bot{position:fixed;left:0;right:0;z-index:20;background:var(--card)}
+.top{top:0;padding:calc(env(safe-area-inset-top,0px) + 8px) 12px 8px;box-shadow:0 3px 10px rgba(0,0,0,.14)}
+.bot{bottom:0;display:flex;gap:10px;justify-content:space-between;padding:10px 12px calc(env(safe-area-inset-bottom,0px) + 10px);box-shadow:0 -3px 10px rgba(0,0,0,.14)}
+.tr{display:flex;align-items:center;gap:10px;max-width:1120px;margin:0 auto 7px}.tt{font-weight:800;font-size:15px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-width:1120px;margin:0 auto}
+.steps button{display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 2px;border:2px solid var(--ln);background:var(--card);border-radius:12px;cursor:pointer;font-size:11px}
+.steps i{font-style:normal;width:20px;height:20px;border-radius:50%;background:var(--ln);display:grid;place-items:center;font-weight:800;font-size:11px}
+.steps b{font-size:9px;color:var(--mut)}.steps span{font-weight:800}
+.steps .on{border-color:var(--gr)}.steps .on i,.steps .ok i{background:var(--gr);color:#fff}
+.say{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:10px 14px;margin:0 0 12px;font-weight:600;font-size:15px;line-height:1.45}
+h2{margin:0 0 8px;font-size:18px;font-weight:800}
+.hint{font-weight:800;color:var(--or);margin-top:12px}.right .hint+.ctl{margin-top:2px}
+.pn[hidden]{display:none}.pn .ent+.ent{margin-top:12px}.pn .ent:first-child{margin-top:0}
+.note{color:var(--mut);font-weight:600;font-size:13px;margin-top:10px;text-align:center}
+.tb{display:grid;grid-template-columns:52px 1fr 14px 1fr 14px 1fr;gap:6px 4px;align-items:center;text-align:center}
+.tb .h{font-size:10px;font-weight:800;color:var(--mut);line-height:1.1}.tb .hr{color:var(--gr)}
+.tb .lb{width:auto;text-align:left;font-size:13px}
+.tg{border:2.5px solid var(--k);color:var(--k);background:var(--card);border-radius:10px;padding:3px 4px;min-height:38px;font-weight:800;font-size:17px;cursor:pointer}
+.tg .t{display:none;font-size:10px;line-height:1.1}.tg.alt .v{display:none}.tg.alt .t{display:block}
+.tb .res{background:var(--gr);border-color:var(--gr);color:#fff;box-shadow:0 0 0 4px rgba(46,158,91,.22)}
+.say2{margin:14px 0 8px;font-weight:600;line-height:1.4}
+.line{display:flex;align-items:flex-end;gap:5px;justify-content:center}
+.line .op{padding-bottom:8px}
+.cap{flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:3px;font-size:11px;font-weight:800;color:var(--mut);text-align:center}
+.cap .n{text-align:center;font-size:15px;padding:4px 2px;white-space:normal}.cap .big,.cap .g{font-size:16px}
+.line input{width:100%;min-width:0;font-size:17px;font-weight:800;text-align:center;border:2.5px solid var(--ink);background:var(--card);border-radius:10px;padding:4px}
+#rc{position:relative;margin:14px auto 0;height:0;min-width:40px}
+#rc.on{background:var(--soft);border:2.5px solid var(--gr);border-radius:6px}
+#rc span{position:absolute;font-weight:800;font-size:12px;color:var(--gr);white-space:nowrap}
+#rl{left:50%;top:-20px;transform:translateX(-50%)}#rw{right:-6px;top:50%;transform:translate(100%,-50%)}
+.alt2{margin-top:18px;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.alt2 input{width:90px;font-size:16px;font-weight:800;border:2.5px solid var(--ink);background:var(--card);border-radius:10px;padding:4px 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.chips span{background:var(--soft);border:1.5px solid var(--gr);border-radius:999px;padding:5px 12px;font-weight:800}
+.nb{flex:1;max-width:260px;border:0;border-radius:14px;padding:12px 18px;font-weight:800;cursor:pointer;font-size:15px}
+.pv{background:#FFE0C9;color:#B5500F}.nx{background:var(--gr);color:#fff}.nb:disabled{opacity:.4;cursor:default}
+
+:root{--or:#F07F0A;--gr:#0A8F3F}
+.top{background:linear-gradient(135deg,#0B6B35,#07522A);box-shadow:0 4px 12px rgba(0,0,0,.28)}
+.tt{color:#fff}
+.back{background:#fff;border-color:#fff;color:#0A6B35}
+.steps{gap:16px}
+.steps button{position:relative;background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18);color:#fff}
+.steps button:not(:last-child)::after{content:"›";position:absolute;right:-13px;top:50%;transform:translateY(-50%);width:10px;text-align:center;color:rgba(255,255,255,.75);font-size:20px;font-weight:800;line-height:1}
+.steps b{color:rgba(255,255,255,.7)}
+.steps i{background:rgba(255,255,255,.25);color:#fff}
+.steps .ok i{background:#8BE3A8;color:#064B24}
+.steps .on{background:#fff;border-color:var(--or);color:#0A6B35}
+.steps .on b{color:var(--or)}.steps .on i{background:var(--or);color:#fff}
+</style></head><body>
+<header class="top" id="top">
+<div class="tr"><a class="back" href="https://capacitacion3vesmartin-ves.github.io/campuscapacitacion/">‹ Volver</a><span class="tt">Simulador Cálculo de techos</span></div>
+<nav class="steps" id="steps">
+<button data-i="0"><i>1</i><b>PASO 1</b><span>Rendimiento</span></button>
+<button data-i="1"><i>2</i><b>PASO 2</b><span>Área</span></button>
+<button data-i="2"><i>3</i><b>PASO 3</b><span>Techos</span></button>
+<button data-i="3"><i>4</i><b>PASO 4</b><span>Tornillos</span></button>
+</nav></header>
+<main id="mn">
+<p class="say" id="say"></p>
+<section class="pn" id="p1"><div class="wrap"><div class="left">
+<h2>Coloca el formato del techo</h2>
+<div class="fmt">
+  <label class="cw">Ancho (m)<input type="text" id="iw" inputmode="decimal" value="1.10"></label>
+  <span class="x">×</span>
+  <label class="cl">Largo (m)<input type="text" id="il" inputmode="decimal" value="3.05"></label>
+  <div class="dots" id="dots" role="group" aria-label="Color de la plancha"></div>
+</div>
+<div id="stage"><div id="sc"></div>
+  <div class="tools">
+    <button class="tool" id="zi" aria-label="Acercar">+</button>
+    <button class="tool" id="zo" aria-label="Alejar">−</button>
+    <button class="tool" id="vu" aria-label="Ver desde más arriba">▲</button>
+    <button class="tool" id="vd" aria-label="Ver desde más abajo">▼</button>
+    <button class="tool" id="vl" aria-label="Girar a la izquierda">◀</button>
+    <button class="tool" id="vr" aria-label="Girar a la derecha">▶</button>
+    <button class="tool" id="rs" aria-label="Centrar la vista">⌖</button>
+  </div></div></div>
+<div class="right">
+<div class="hint">👆 Mueve las barras para simular los traslapes</div>
+<div class="ctl cw"><span>Costado</span><input type="range" id="vs" min="0" max="100" value="0" aria-label="Plancha del costado, hasta 10 cm"><output id="os"></output></div>
+<div class="ctl cl"><span>Arriba</span><input type="range" id="vt" min="0" max="100" value="0" aria-label="Plancha de arriba, hasta 20 cm"><output id="ot"></output></div>
+<div class="sep">Entonces:</div>
+<div class="ent">
+<div class="tb">
+<span></span><span class="h">Medida real</span><span></span><span class="h">Traslape</span><span></span><span class="h hr">Medida útil</span>
+<span class="lb cw">Ancho</span><button class="tg" style="--k:var(--bl)"><span class="v" id="e1"></span><span class="t">Ancho real del techo</span></button><span class="op">−</span><button class="tg" style="--k:var(--or)"><span class="v">0.10</span><span class="t">Traslape</span></button><span class="op">=</span><span class="n fin res" id="e2"></span>
+<span class="lb cl">Largo</span><button class="tg" style="--k:var(--pu)"><span class="v" id="e3"></span><span class="t">Largo real del techo</span></button><span class="op">−</span><button class="tg" style="--k:var(--or)"><span class="v">0.20</span><span class="t">Traslape</span></button><span class="op">=</span><span class="n fin res" id="e4"></span>
+</div>
+<div class="say2">Ahora que tenemos la medida útil, <b>multiplicamos el ancho útil por el largo útil</b> para hallar el rendimiento de la plancha:</div>
+<div class="line">
+<div class="cap">Ancho útil<span class="n bs" id="e5"></span></div><span class="op">×</span>
+<div class="cap">Largo útil<span class="n ps" id="e6"></span></div><span class="op">=</span>
+<div class="cap">Rendimiento<span class="n g" id="e7"></span></div>
+</div></div></div></div></section>
+<section class="pn" id="p2" hidden><div class="ent">
+<div class="line">
+<div class="cap">Lado 1 (m)<input type="text" id="ka" inputmode="decimal" placeholder="0.00"></div><span class="op">×</span>
+<div class="cap">Lado 2 (m)<input type="text" id="kl" inputmode="decimal" placeholder="0.00"></div><span class="op">=</span>
+<div class="cap">Área del espacio<span class="n fin big" id="c1">—</span></div>
+</div>
+<div id="rc"><span id="rl"></span><span id="rw"></span></div>
+<div class="alt2">¿El cliente ya te dio los m²? <input type="text" id="km" inputmode="decimal" placeholder="m²"></div>
+</div></section>
+<section class="pn" id="p3" hidden><div class="ent">
+<div class="line">
+<div class="cap">Área del espacio<span class="n" id="c1b">—</span></div><span class="op">÷</span>
+<div class="cap">Rendimiento<span class="n go" id="c2"></span></div><span class="op">=</span>
+<div class="cap">Techos<span class="n fin big" id="c3">—</span></div>
+</div><div class="note" id="cx"></div></div></section>
+<section class="pn" id="p4" hidden><div class="ent">
+<div class="line">
+<div class="cap">Techos<span class="n" id="c4">—</span></div><span class="op">÷</span>
+<div class="cap">Techos por ciento<span class="n">10</span></div><span class="op">=</span>
+<div class="cap">Tornillos<span class="n fin big" id="c5">—</span></div>
+</div><div class="note">1 ciento de tornillos por cada 10 techos.</div></div>
+<div class="ent"><b>💡 Venta cruzada: sugiere también</b><div class="chips"><span>Canaletas</span><span>Abrazaderas</span><span>Espuma expansiva</span><span>Cumbreras</span><span>Sellador</span></div></div></section>
+</main>
+<footer class="bot" id="bot"><button id="pv" class="nb pv">‹ ANTERIOR</button><button id="nx" class="nb nx">SIGUIENTE ›</button></footer>
+<script>
+const C=['#C8502F','#7D8A96','#8B5E3C','#3C4650','#9C2F45'];
+const K=100,$=id=>document.getElementById(id),f=x=>x.toFixed(2),sc=$('sc'),st=$('stage');
+const s={w:1.10,l:3.05,c:C[0],vs:0,vt:0,rz:35,zm:1,px:0,py:0,rx:0};
+const mk=(c,t)=>{const d=document.createElement('div');d.className=c;if(t)d.innerHTML='<span></span>';sc.appendChild(d);return d};
+const A=mk('sh'),S=mk('sh'),T=mk('sh'),U=mk('ut'),HS=mk('ht'),HT=mk('ht'),
+ W0=mk('bw'),W1=mk('bw'),W2=mk('bw'),L0=mk('bl'),L1=mk('bl'),L2=mk('bl'),
+ PS=mk('pb',1),PT=mk('pb',1),PU=mk('pb u',1),PW=mk('pb w',1),PL=mk('pb l',1);
+const bx=(d,x,y,w,h,z,on=true)=>{d.style.display=on?'':'none';d.style.left=x*K+'px';d.style.top=y*K+'px';d.style.width=w*K+'px';d.style.height=h*K+'px';d.style.transform='translateZ('+z+'px)'};
+const pt=(d,x,y,t,on=true)=>{d.style.display=on?'':'none';d.style.left=x*K+'px';d.style.top=y*K+'px';d.firstChild.textContent=t};
+function fit(){const r=s.rz*Math.PI/180,c=Math.abs(Math.cos(r)),n=Math.abs(Math.sin(r)),gw=2*s.w+1,gh=2*s.l+1;
+  return Math.min(st.clientWidth*.92/((gw*c+gh*n)*K),st.clientHeight*.92/((gw*n+gh*c)*K))}
+function view(){sc.style.setProperty('--px',s.px+'px');sc.style.setProperty('--py',s.py+'px');sc.style.setProperty('--rz',s.rz+'deg');sc.style.setProperty('--rx',s.rx+'deg');sc.style.setProperty('--z',fit()*s.zm)}
+function draw(){
+  const{w,l}=s,fs=s.vs/100,ft=s.vt/100,gs=.5-fs*.6,gt=.5-ft*.7,
+  os=Math.max(0,-gs),ot=Math.max(0,-gt),cs=Math.round(os*100),ct=Math.round(ot*100),
+  ax=-(w+.25),ay=.25,re=(l-.2)*(w-.1),t=.045,by=ay+l+.14,lx=ax-.28;
+  sc.style.setProperty('--c',s.c);if(typeof cal=='function'&&typeof q!='undefined')cal();
+  bx(A,ax,ay,w,l,0);bx(S,ax+w+gs,ay,w,l,6);bx(T,ax,ay-l-gt,w,l,12);
+  const ok=cs==10&&ct==20;bx(U,ax,ay+.2,w-.1,l-.2,3,ok);
+  bx(HS,ax+w-os,ay,os,l,16,os>0);bx(HT,ax,ay,w,ot,17,ot>0);
+  bx(W0,ax,by,w,t,2);bx(W1,ax,by-.09,t,.22,2);bx(W2,ax+w-t,by-.09,t,.22,2);
+  bx(L0,lx,ay,t,l,2);bx(L1,lx-.09,ay,.22,t,2);bx(L2,lx-.09,ay+l-t,.22,t,2);
+  pt(PS,ax+w-os/2,ay+l*.75,cs+' cm',os>0);
+  pt(PT,ax+w/2,ay+ot/2,ct+' cm',ot>0);
+  pt(PU,ax+(w-.1)/2,ay+.2+(l-.2)/2,f(re)+' m²',ok);
+  pt(PW,ax+w/2,by+t/2,f(w)+' m');pt(PL,lx+t/2,ay+l/2,f(l)+' m');
+  $('os').textContent=cs+' / 10 cm'+(cs==10?' ✓':'');$('ot').textContent=ct+' / 20 cm'+(ct==20?' ✓':'');
+  $('e1').textContent=f(w);$('e2').textContent=f(w-.1);$('e3').textContent=f(l);$('e4').textContent=f(l-.2);
+  $('e5').textContent=f(w-.1);$('e6').textContent=f(l-.2);$('e7').textContent=f(re)+' m²';
+}
+$('dots').innerHTML=C.map((c,i)=>`<button style="background:${c}" data-c="${c}" aria-pressed="${i==0}" aria-label="Color ${i+1}"></button>`).join('');
+$('dots').onclick=e=>{const b=e.target.closest('button');if(!b)return;s.c=b.dataset.c;[...$('dots').children].forEach(x=>x.setAttribute('aria-pressed',x==b));draw()};
+const num=v=>parseFloat(String(v).replace(',','.'));
+$('iw').oninput=e=>{const v=num(e.target.value);if(v>=.3&&v<=3){s.w=v;s.zm=1;view();draw()}};
+$('il').oninput=e=>{const v=num(e.target.value);if(v>=.6&&v<=12){s.l=v;s.zm=1;view();draw()}};
+$('vs').oninput=e=>{s.vs=+e.target.value;draw()};
+$('vt').oninput=e=>{s.vt=+e.target.value;draw()};
+const zoom=k=>{s.zm=Math.min(4,Math.max(.4,s.zm*k));view()};
+$('zi').onclick=()=>zoom(1.25);$('zo').onclick=()=>zoom(.8);
+$('vu').onclick=()=>{s.rx=Math.max(0,s.rx-15);view()};$('vd').onclick=()=>{s.rx=Math.min(75,s.rx+15);view()};
+$('vl').onclick=()=>{s.rz-=15;view()};$('vr').onclick=()=>{s.rz+=15;view()};
+$('rs').onclick=()=>{s.px=s.py=0;s.zm=1;s.rx=0;s.rz=35;view()};
+const P=new Map();let d0=0;
+st.onpointerdown=e=>{if(e.target.closest('.tools'))return;st.setPointerCapture(e.pointerId);P.set(e.pointerId,e);if(P.size==2){const[a,b]=[...P.values()];d0=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)}};
+st.onpointermove=e=>{
+  if(!P.has(e.pointerId))return;const o=P.get(e.pointerId);
+  if(P.size==1){s.px+=e.clientX-o.clientX;s.py+=e.clientY-o.clientY;P.set(e.pointerId,e);view()}
+  else{P.set(e.pointerId,e);const[a,b]=[...P.values()],d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);if(d0)zoom(d/d0);d0=d}
+};
+st.onpointerup=st.onpointercancel=e=>{P.delete(e.pointerId);d0=0};
+st.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.0015))},{passive:false});
+addEventListener('resize',view);
+const q={m:0},g=id=>num($(id).value);
+function cal(){
+  const re=(s.l-.2)*(s.w-.1),m=q.m,ex=m/re,n=m>0?Math.ceil(ex-1e-9):0,c=Math.ceil(n/10),pl=(k,a,b)=>k+(k==1?a:b);
+  $('c1').textContent=$('c1b').textContent=m>0?f(m)+' m²':'—';$('c2').textContent=f(re)+' m²';
+  $('c3').textContent=n?pl(n,' techo',' techos'):'—';$('cx').textContent=n?f(m)+' ÷ '+f(re)+' = '+f(ex)+' → redondeamos hacia arriba':'';
+  $('c4').textContent=n?pl(n,' techo',' techos'):'—';$('c5').textContent=n?pl(c,' ciento',' cientos'):'—';
+  const a=g('ka'),b=g('kl'),r=$('rc');
+  if(a>0&&b>0){const k=Math.min(200/a,110/b);r.className='on';r.style.width=a*k+'px';r.style.height=b*k+'px';$('rl').textContent=f(a)+' m';$('rw').textContent=f(b)+' m'}
+  else{r.className='';r.style.height='0';r.style.width='40px';$('rl').textContent=$('rw').textContent=''}
+}
+$('ka').oninput=$('kl').oninput=()=>{const a=g('ka'),b=g('kl');q.m=a>0&&b>0?a*b:0;$('km').value=q.m?f(q.m):'';cal()};
+$('km').oninput=()=>{const m=g('km');q.m=m>0?m:0;$('ka').value=$('kl').value='';cal()};
+view();draw();
+const TXT=['<b>Paso 1:</b> Hallar el rendimiento del techo. Primero descontamos 20 centímetros al largo y 10 centímetros al ancho. Una vez hecha la resta, multiplicamos los lados para obtener el rendimiento del techo en metros cuadrados.','<b>Paso 2:</b> Hallar el área del espacio. El cliente nos dará las medidas del lado 1 y del lado 2, y las multiplicamos para hallar el área del espacio en metros cuadrados.','<b>Paso 3:</b> Dividimos el área del espacio entre el rendimiento y nos da la cantidad de techos.','<b>Paso 4:</b> Finalmente consideramos 1 ciento de tornillos por cada 10 techos. Y podemos sugerir la venta cruzada de Canaletas, Abrazaderas, Espuma expansiva, etc.'];
+let cur=0,mx=0;
+function pad(){$('mn').style.paddingTop=($('top').offsetHeight+12)+'px';$('mn').style.paddingBottom=($('bot').offsetHeight+16)+'px'}
+function go(i){cur=Math.max(0,Math.min(3,i));mx=Math.max(mx,cur);
+ [0,1,2,3].forEach(k=>{$('p'+(k+1)).hidden=k!=cur;$('steps').children[k].className=k==cur?'on':(k<=mx?'ok':'')});
+ $('say').innerHTML=TXT[cur];$('pv').disabled=cur==0;$('nx').textContent=cur==3?'FINALIZAR ›':'SIGUIENTE ›';
+ pad();if(cur==0)view();scrollTo({top:0,behavior:'smooth'})}
+$('steps').onclick=e=>{const b=e.target.closest('button');if(b)go(+b.dataset.i)};
+$('pv').onclick=()=>go(cur-1);
+$('nx').onclick=()=>{if(cur==3)location.href="https://capacitacion3vesmartin-ves.github.io/campuscapacitacion/";else go(cur+1)};
+document.querySelectorAll('.tg').forEach(b=>b.onclick=()=>{b.classList.toggle('alt');clearTimeout(b._t);if(b.classList.contains('alt'))b._t=setTimeout(()=>b.classList.remove('alt'),3500)});
+addEventListener('resize',pad);
+go(0);
+</script></body></html>
